@@ -39,11 +39,11 @@ WriteMakefile(
             META_MERGE => {
                 resources => {
                     license  => 'http://dev.perl.org/licenses/',
-                    homepage => 'https://trac.msi.umn.edu/trac/sw',
+                    homepage => 'https://github.com/karpet/net-ldap-class',
                     bugtracker =>
                         'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-LDAP-Class',
                     repository =>
-                        'https://svn.msi.umn.edu/sw/perl/Net-LDAP-Class/',
+                        'https://github.com/karpet/net-ldap-class'
                 },
             }
             )
