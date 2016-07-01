@@ -4,6 +4,7 @@ use warnings;
 use base qw( Net::LDAP::Class::User );
 use Carp;
 use Data::Dump ();
+use Net::LDAP::SID;
 
 my $PRIMARY_GROUP_NOT_USED = 513;
 my $AD_TIMESTAMP_OFFSET    = 116444736390271392;
@@ -13,7 +14,7 @@ use Net::LDAP::Class::MethodMaker (
     'scalar --get_set_init' => [qw( default_home_dir default_email_suffix )],
 );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 NAME
 
@@ -145,7 +146,7 @@ sub fetch_group {
     # we must do gymnastics using SIDs
     $self->debug and warn "gid = $gid";
 
-    my $user_sid_string = $self->_sid2string( $self->objectSID );
+    my $user_sid_string = Net::LDAP::SID->new( $self->objectSID )->as_string;
 
     $self->debug and warn "user_sid_string:  $user_sid_string";
     ( my $group_sid_string = $user_sid_string ) =~ s/\-[^\-]+$/-$gid/;
@@ -156,42 +157,6 @@ sub fetch_group {
         objectSID => $group_sid_string,
         ldap      => $self->ldap
     )->read;
-}
-
-sub _string2sid {
-    my ( $self, $string ) = @_;
-
-    my ( undef, $revision_level, $authority, @sub_authorities ) = split /-/,
-        $string;
-    my $sub_authority_count = scalar @sub_authorities;
-
-    my $sid = pack 'C Vxx C V*', $revision_level, $authority,
-        $sub_authority_count, @sub_authorities;
-
-    if ( $ENV{LDAP_DEBUG} ) {
-        carp "sid    = " . join( '\\', unpack '(H2)*', $sid );
-        carp "string = $string";
-    }
-
-    return $sid;
-}
-
-sub _sid2string {
-    my ( $self, $sid ) = @_;
-
-    my ($revision_level,      $authority,
-        $sub_authority_count, @sub_authorities
-    ) = unpack 'C Vxx C V*', $sid;
-
-    die if $sub_authority_count != scalar @sub_authorities;
-
-    my $string = join '-', 'S', $revision_level, $authority, @sub_authorities;
-
-    if ( $ENV{LDAP_DEBUG} ) {
-        carp "sid    = " . join( '\\', unpack '(H2)*', $sid );
-        carp "string = $string";
-    }
-    return $string;
 }
 
 =head2 last_logon_localtime

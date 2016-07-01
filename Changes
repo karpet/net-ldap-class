@@ -1,5 +1,9 @@
 Revision history for Net-LDAP-Class
 
+0.27 01 July 2016
+ - use Net::LDAP::SID (with fixed AD SID manipulation)
+   fixes https://rt.cpan.org/Ticket/Display.html?id=115702
+
 0.26 22 Feb 2011
  - patch from dekimsey@ufl.edu per RT#65658
    https://rt.cpan.org/Ticket/Display.html?id=65658 that fixes bug with
